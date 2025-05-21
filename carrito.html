@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tienda de Maquillaje</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #fef6f9;
+    }
+
+    header {
+      background-color: #ff6fa1;
+      color: white;
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .cart-icon {
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    .container {
+      display: flex;
+      transition: transform 0.4s ease;
+      width: 200%;
+    }
+
+    .slide {
+      width: 100%;
+      padding: 2rem;
+      box-sizing: border-box;
+    }
+
+    .product {
+      background: white;
+      border-radius: 10px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    button {
+      background: #ff6fa1;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .cart-items {
+      background: white;
+      padding: 1rem;
+      border-radius: 10px;
+    }
+
+    .total {
+      margin-top: 1rem;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<script>
+  let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+
+  function agregarAlCarrito(nombre, precio) {
+    const index = carrito.findIndex(item => item.nombre === nombre);
+    if (index !== -1) {
+      carrito[index].cantidad += 1;
+    } else {
+      carrito.push({ nombre, precio, cantidad: 1 });
+    }
+
+    localStorage.setItem('carrito', JSON.stringify(carrito));
+    mostrarCarrito();
+  }
+
+  function mostrarCarrito() {
+    const lista = document.getElementById("lista-carrito");
+    const total = document.getElementById("total-carrito");
+    lista.innerHTML = "";
+    let suma = 0;
+
+    carrito.forEach((item, index) => {
+      const subtotal = item.precio * item.cantidad;
+      const li = document.createElement("li");
+      li.innerHTML = `
+        ${item.nombre} (x${item.cantidad}) - $${subtotal.toFixed(2)}
+        <button style="margin-left: 10px; color:red;" onclick="eliminarProducto(${index})">❌</button>
+      `;
+      lista.appendChild(li);
+      suma += subtotal;
+    });
+
+    total.textContent = suma.toFixed(2);
+    document.getElementById("carrito-slide").classList.add("active");
+  }
+
+  function eliminarProducto(indice) {
+    carrito.splice(indice, 1);
+    localStorage.setItem('carrito', JSON.stringify(carrito));
+    mostrarCarrito();
+  }
+
+  function vaciarCarrito() {
+    carrito = [];
+    localStorage.removeItem('carrito');
+    mostrarCarrito();
+  }
+
+  function cerrarCarrito() {
+    document.getElementById("carrito-slide").classList.remove("active");
+  }
+
+  // Mostrar el carrito automáticamente si ya hay productos
+  if (carrito.length > 0) {
+    mostrarCarrito();
+  }
+</script>
